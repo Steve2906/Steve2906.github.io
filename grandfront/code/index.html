@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Grand Front — код разблокировки</title>
+  <style>
+    :root {
+      --bg: #1a1612;
+      --panel: #221d18;
+      --line: #3b3228;
+      --text: #e8dfd0;
+      --muted: #9a8f7d;
+      --gold: #c9a227;
+      --bad: #b4553c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px 16px;
+    }
+    main {
+      width: 100%;
+      max-width: 520px;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 28px 22px;
+    }
+    h1 {
+      font-size: 13px;
+      letter-spacing: 2.4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 18px;
+      font-weight: 700;
+    }
+    p { line-height: 1.55; margin: 0 0 12px; }
+    .muted { color: var(--muted); font-size: 14px; }
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0 6px;
+      font-size: 17px;
+    }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--line);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      flex: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .code {
+      font-family: "Courier New", monospace;
+      font-size: clamp(22px, 7vw, 34px);
+      letter-spacing: 2px;
+      font-weight: 700;
+      color: var(--gold);
+      background: #171310;
+      border: 1px solid var(--line);
+      padding: 18px 12px;
+      text-align: center;
+      margin: 18px 0 14px;
+      user-select: all;
+      word-break: break-all;
+    }
+    button {
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--bg);
+      background: var(--gold);
+      border: none;
+      padding: 13px 18px;
+      width: 100%;
+      cursor: pointer;
+      letter-spacing: 0.6px;
+    }
+    button.ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+      margin-top: 10px;
+    }
+    button:disabled { opacity: 0.55; cursor: default; }
+    ol { padding-left: 20px; margin: 14px 0 0; }
+    li { margin-bottom: 8px; line-height: 1.5; font-size: 15px; }
+    .error { color: var(--bad); }
+    .hidden { display: none; }
+    footer {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    footer a { color: var(--gold); }
+  </style>
+</head>
+<body>
+<main>
+  <div class="panel">
+    <h1>Grand Front · код разблокировки</h1>
+
+    <section id="waiting">
+      <div class="status">
+        <div class="spinner"></div>
+        <span id="waitingText">Проверяем оплату…</span>
+      </div>
+      <p class="muted">
+        Обычно это занимает несколько секунд. Страницу можно не закрывать —
+        код появится здесь сам.
+      </p>
+    </section>
+
+    <section id="done" class="hidden">
+      <p>Оплата получена. Ваш код разблокировки:</p>
+      <div class="code" id="codeValue">—</div>
+      <button id="copyBtn">Скопировать код</button>
+      <ol>
+        <li>Вернитесь в игру, на экран нужного дополнения.</li>
+        <li>Вставьте код в поле «Код разблокировки» — дефисы подставятся сами.</li>
+        <li>Нажмите «Активировать».</li>
+      </ol>
+      <p class="muted" style="margin-top:14px">
+        Сохраните код: по нему дополнение можно открыть ещё раз, если
+        переустановите игру или смените телефон.
+      </p>
+    </section>
+
+    <section id="failed" class="hidden">
+      <p class="error" id="failedText">Не удалось проверить оплату.</p>
+      <p class="muted">
+        Деньги при этом не теряются: код привязан к заказу и выдаётся, как
+        только банк подтвердит платёж.
+      </p>
+      <button id="retryBtn" class="ghost">Проверить ещё раз</button>
+    </section>
+  </div>
+
+  <footer>
+    Проблема с оплатой? Напишите в
+    <a href="https://t.me/grandfront">Telegram-канал Grand Front</a>.
+  </footer>
+</main>
+
+<script>
+  // Функция order_status (supabase/functions/order_status) — публичная:
+  // заказ находится только по своему uuid, ключи здесь не нужны.
+  var STATUS_URL =
+    'https://ouaulukabwhopgccnxuw.supabase.co/functions/v1/order_status';
+
+  var orderId = new URLSearchParams(location.search).get('o') || '';
+  var attempt = 0;
+  var timer = null;
+
+  var waiting = document.getElementById('waiting');
+  var done = document.getElementById('done');
+  var failed = document.getElementById('failed');
+  var failedText = document.getElementById('failedText');
+  var waitingText = document.getElementById('waitingText');
+  var codeValue = document.getElementById('codeValue');
+
+  function show(section) {
+    waiting.classList.toggle('hidden', section !== 'waiting');
+    done.classList.toggle('hidden', section !== 'done');
+    failed.classList.toggle('hidden', section !== 'failed');
+  }
+
+  function fail(text) {
+    failedText.textContent = text;
+    show('failed');
+  }
+
+  function showCode(code) {
+    codeValue.textContent = code;
+    show('done');
+    if (timer) clearTimeout(timer);
+  }
+
+  // Первую минуту спрашиваем часто, дальше реже: банк иногда подтверждает
+  // платёж не мгновенно.
+  function nextDelay() {
+    if (attempt < 20) return 3000;
+    if (attempt < 40) return 10000;
+    return 0;
+  }
+
+  function poll() {
+    attempt++;
+    fetch(STATUS_URL + '?o=' + encodeURIComponent(orderId), {
+      headers: { 'Accept': 'application/json' }
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (body) {
+        if (!body || body.ok !== true) {
+          fail(body && body.error === 'unknown_order'
+            ? 'Заказ не найден. Проверьте ссылку из формы оплаты.'
+            : 'Не удалось проверить оплату.');
+          return;
+        }
+        if (body.status === 'paid' && body.code) {
+          showCode(body.code);
+          return;
+        }
+        if (body.status === 'underpaid') {
+          fail('Сумма платежа меньше стоимости дополнения. Напишите нам в Telegram — разберёмся.');
+          return;
+        }
+        var delay = nextDelay();
+        if (delay === 0) {
+          fail('Оплата пока не подтвердилась.');
+          return;
+        }
+        if (attempt > 6) {
+          waitingText.textContent = 'Ждём подтверждения от банка…';
+        }
+        timer = setTimeout(poll, delay);
+      })
+      .catch(function () {
+        var delay = nextDelay();
+        if (delay === 0) {
+          fail('Нет связи с сервером. Проверьте интернет.');
+          return;
+        }
+        timer = setTimeout(poll, delay);
+      });
+  }
+
+  document.getElementById('retryBtn').addEventListener('click', function () {
+    attempt = 0;
+    waitingText.textContent = 'Проверяем оплату…';
+    show('waiting');
+    poll();
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    var btn = this;
+    var text = codeValue.textContent;
+    function ok() {
+      btn.textContent = 'Код скопирован';
+      setTimeout(function () { btn.textContent = 'Скопировать код'; }, 2000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(ok, function () {
+        btn.textContent = 'Выделите код и скопируйте вручную';
+      });
+    } else {
+      var range = document.createRange();
+      range.selectNodeContents(codeValue);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      ok();
+    }
+  });
+
+  if (!orderId) {
+    fail('В ссылке нет номера заказа. Откройте страницу по ссылке из формы оплаты.');
+  } else {
+    poll();
+  }
+</script>
+</body>
+</html>
