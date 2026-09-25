@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Grand Front — купить код DLC</title>
+  <style>
+    :root {
+      --bg: #1a1612;
+      --panel: #221d18;
+      --line: #3b3228;
+      --text: #e8dfd0;
+      --muted: #9a8f7d;
+      --gold: #c9a227;
+      --bad: #b4553c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px 16px;
+    }
+    main { width: 100%; max-width: 520px; }
+    .panel { background: var(--panel); border: 1px solid var(--line); }
+    .hero { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+    .body { padding: 22px 22px 26px; }
+    h1 {
+      font-size: 13px;
+      letter-spacing: 2.4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 14px;
+      font-weight: 700;
+    }
+    h2 { font-size: 24px; margin: 0 0 4px; font-weight: 700; }
+    .sub { color: var(--muted); font-style: italic; margin: 0 0 14px; }
+    p { line-height: 1.55; margin: 0 0 12px; }
+    .muted { color: var(--muted); font-size: 14px; }
+    button {
+      width: 100%;
+      margin: 10px 0 6px;
+      padding: 14px 16px;
+      background: var(--gold);
+      color: #1a1612;
+      border: 0;
+      font: 700 16px/1 Georgia, serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.6; cursor: default; }
+    .error { color: var(--bad); font-size: 14px; min-height: 1em; margin: 6px 0 0; }
+    ol { padding-left: 20px; margin: 8px 0 0; line-height: 1.55; }
+    footer { color: var(--muted); font-size: 13px; text-align: center; margin-top: 16px; }
+    a { color: var(--gold); }
+  </style>
+</head>
+<body>
+<main>
+  <div class="panel">
+    <img class="hero" src="uk_1940.webp" alt="">
+    <div class="body">
+      <h1>Grand Front · код DLC</h1>
+      <h2>Франция и Британия</h2>
+      <p class="sub">1940 · Аррас и Дюнкерк</p>
+      <p>
+        Две операции мая 1940 года за Великобританию: танковый контрудар у
+        Арраса и оборона дюнкеркского периметра в операции «Динамо».
+      </p>
+      <button id="buy">Купить за 90 ₽</button>
+      <p class="muted">Оплата картой на сайте ЮMoney. Сразу после оплаты
+        откроется страница с кодом разблокировки.</p>
+      <p class="error" id="error"></p>
+
+      <p class="muted" style="margin-top: 14px">Как активировать код в игре:</p>
+      <ol class="muted">
+        <li>откройте «Кампании» и выберите «Франция и Британия»;</li>
+        <li>в разделе «Код разблокировки» введите код и нажмите
+          «Активировать».</li>
+      </ol>
+      <p class="muted" style="margin-top: 10px">Код подходит для версии из
+        Google Play и RuStore и открывает дополнение на нескольких
+        устройствах.</p>
+    </div>
+  </div>
+  <footer>
+    Проблема с оплатой? Напишите в
+    <a href="https://t.me/grandfront">Telegram-канал Grand Front</a>.
+  </footer>
+</main>
+
+<script>
+  // Заказ создаёт та же функция, что и игра (supabase/functions/pay_start);
+  // ЮMoney после оплаты возвращает на страницу выдачи кода /code/.
+  // Ключ — публичный (publishable), он же зашит в игру.
+  var PAY_START =
+    'https://ouaulukabwhopgccnxuw.supabase.co/functions/v1/pay_start';
+  var KEY = 'sb_publishable__lgEzQVWzGhaE55Hvvb53w_6rVmwzkn';
+  var PACK = 'uk_1940';
+
+  // Заказы привязаны к «устройству»: у браузера это случайный id, чтобы
+  // повторное нажатие вернуло тот же незаплаченный заказ, а не новый.
+  function deviceId() {
+    var id = null;
+    try { id = localStorage.getItem('gf_web_device'); } catch (e) {}
+    if (!id) {
+      var rnd = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : String(Date.now()) + Math.random().toString(16).slice(2);
+      id = 'web-' + rnd;
+      try { localStorage.setItem('gf_web_device', id); } catch (e) {}
+    }
+    return id;
+  }
+
+  var button = document.getElementById('buy');
+  var error = document.getElementById('error');
+
+  button.addEventListener('click', function () {
+    button.disabled = true;
+    error.textContent = '';
+    fetch(PAY_START, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + KEY,
+        'apikey': KEY
+      },
+      body: JSON.stringify({ packId: PACK, deviceId: deviceId() })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (body) {
+        if (body && body.ok === true && body.payUrl) {
+          location.href = body.payUrl;
+          return;
+        }
+        button.disabled = false;
+        error.textContent = body && body.error === 'not_for_sale'
+          ? 'Дополнение сейчас не продаётся.'
+          : 'Не удалось создать заказ. Попробуйте ещё раз.';
+      })
+      .catch(function () {
+        button.disabled = false;
+        error.textContent =
+          'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.';
+      });
+  });
+</script>
+</body>
+</html>
