@@ -58,29 +58,48 @@
     .error { color: var(--bad); font-size: 14px; min-height: 1em; margin: 6px 0 0; }
     ol { padding-left: 20px; margin: 8px 0 0; line-height: 1.55; }
     footer { color: var(--muted); font-size: 13px; text-align: center; margin-top: 16px; }
+    .packs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 14px; }
+    .pack {
+      display: block;
+      padding: 0;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+      text-transform: none;
+      letter-spacing: 0;
+      margin: 0;
+      width: auto;
+    }
+    .pack img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; opacity: 0.7; }
+    .pack span { display: block; padding: 8px 10px 10px; font-size: 14px; line-height: 1.3; }
+    .pack small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .pack[aria-checked="true"] { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+    .pack[aria-checked="true"] img { opacity: 1; }
+    .pack:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
     a { color: var(--gold); }
   </style>
 </head>
 <body>
 <main>
+  <div class="packs" role="radiogroup" aria-label="Дополнение" id="packs"></div>
   <div class="panel">
-    <img class="hero" src="uk_1940.webp" alt="">
+    <img class="hero" id="hero" src="su_1941.webp" alt="">
     <div class="body">
       <h1>Grand Front · код DLC</h1>
-      <h2>Франция и Британия</h2>
-      <p class="sub">1940 · Аррас и Дюнкерк</p>
-      <p>
-        Две операции мая 1940 года за Великобританию: танковый контрудар у
-        Арраса и оборона дюнкеркского периметра в операции «Динамо».
-      </p>
-      <button id="buy">Купить за 90 ₽</button>
+      <h2 id="title"></h2>
+      <p class="sub" id="subtitle"></p>
+      <p id="about"></p>
+      <button id="buy"></button>
       <p class="muted">Оплата картой на сайте ЮMoney. Сразу после оплаты
         откроется страница с кодом разблокировки.</p>
       <p class="error" id="error"></p>
 
       <p class="muted" style="margin-top: 14px">Как активировать код в игре:</p>
       <ol class="muted">
-        <li>откройте «Кампании» и выберите «Франция и Британия»;</li>
+        <li>откройте «Кампании» и выберите «<span id="howto"></span>»;</li>
         <li>в разделе «Код разблокировки» введите код и нажмите
           «Активировать».</li>
       </ol>
@@ -102,7 +121,33 @@
   var PAY_START =
     'https://ouaulukabwhopgccnxuw.supabase.co/functions/v1/pay_start';
   var KEY = 'sb_publishable__lgEzQVWzGhaE55Hvvb53w_6rVmwzkn';
-  var PACK = 'uk_1940';
+
+  // Что продаётся. Цена к оплате приходит с сервера (dlc_products.price_rub);
+  // здесь она только на кнопке и должна совпадать с dlc_catalog.json.
+  var PACKS = [
+    {
+      id: 'su_1941',
+      title: 'Барбаросса',
+      subtitle: '1941 · Приграничные сражения и Смоленск',
+      about: 'Лето 1941 года за Красную армию: от первого дня войны на ' +
+        'границе до первой победы под Ельней. Контрудары механизированных ' +
+        'корпусов под Гродно, Расейняем и Дубно, оборона Прута и Днепра, ' +
+        'Смоленское сражение и рождение советской гвардии.',
+      price: 170,
+      image: 'su_1941.webp'
+    },
+    {
+      id: 'uk_1940',
+      title: 'Франция и Британия',
+      subtitle: '1940 · Аррас и Дюнкерк',
+      about: 'Две операции мая 1940 года за Великобританию: танковый ' +
+        'контрудар у Арраса и оборона дюнкеркского периметра в операции ' +
+        '«Динамо».',
+      price: 90,
+      image: 'uk_1940.webp'
+    }
+  ];
+  var pack = PACKS[0];
 
   // Заказы привязаны к «устройству»: у браузера это случайный id, чтобы
   // повторное нажатие вернуло тот же незаплаченный заказ, а не новый.
@@ -122,6 +167,46 @@
   var button = document.getElementById('buy');
   var error = document.getElementById('error');
 
+  function show(p) {
+    pack = p;
+    document.getElementById('hero').src = p.image;
+    document.getElementById('title').textContent = p.title;
+    document.getElementById('subtitle').textContent = p.subtitle;
+    document.getElementById('about').textContent = p.about;
+    document.getElementById('howto').textContent = p.title;
+    button.textContent = 'Купить за ' + p.price + ' ₽';
+    error.textContent = '';
+    var cards = document.querySelectorAll('.pack');
+    for (var i = 0; i < cards.length; i++) {
+      cards[i].setAttribute('aria-checked', cards[i].dataset.id === p.id);
+    }
+    try { history.replaceState(null, '', '?pack=' + p.id); } catch (e) {}
+  }
+
+  // Карточки выбора; ?pack=uk_1940 в ссылке выбирает дополнение сразу.
+  var picker = document.getElementById('packs');
+  PACKS.forEach(function (p) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'pack';
+    b.dataset.id = p.id;
+    b.setAttribute('role', 'radio');
+    var img = document.createElement('img');
+    img.src = p.image;
+    img.alt = '';
+    var label = document.createElement('span');
+    label.textContent = p.title;
+    var price = document.createElement('small');
+    price.textContent = p.subtitle.split(' · ')[0] + ' · ' + p.price + ' ₽';
+    label.appendChild(price);
+    b.appendChild(img);
+    b.appendChild(label);
+    b.addEventListener('click', function () { show(p); });
+    picker.appendChild(b);
+  });
+  var wanted = new URLSearchParams(location.search).get('pack');
+  show(PACKS.filter(function (p) { return p.id === wanted; })[0] || PACKS[0]);
+
   button.addEventListener('click', function () {
     button.disabled = true;
     error.textContent = '';
@@ -132,7 +217,7 @@
         'Authorization': 'Bearer ' + KEY,
         'apikey': KEY
       },
-      body: JSON.stringify({ packId: PACK, deviceId: deviceId() })
+      body: JSON.stringify({ packId: pack.id, deviceId: deviceId() })
     })
       .then(function (r) { return r.json(); })
       .then(function (body) {
