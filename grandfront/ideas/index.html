@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grand Front — предложения и пожелания</title>
+  <style>
+    :root {
+      --bg: #1a1612;
+      --panel: #221d18;
+      --field: #171310;
+      --line: #3b3228;
+      --text: #e8dfd0;
+      --muted: #9a8f7d;
+      --gold: #c9a227;
+      --bad: #b4553c;
+      --good: #8fa65a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px 16px;
+    }
+    main { width: 100%; max-width: 620px; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 28px 22px;
+    }
+    h1 {
+      font-size: 13px;
+      letter-spacing: 2.4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 18px;
+      font-weight: 700;
+    }
+    p { line-height: 1.55; margin: 0 0 12px; }
+    .muted { color: var(--muted); font-size: 14px; }
+    .note {
+      border-left: 2px solid var(--gold);
+      padding: 2px 0 2px 14px;
+      margin: 22px 0 14px;
+      font-size: 15px;
+    }
+    label.title {
+      display: block;
+      font-size: 12px;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 8px;
+    }
+    label.title .req { color: var(--gold); }
+    .field { margin-bottom: 18px; }
+    input[type=text], textarea {
+      width: 100%;
+      font-family: inherit;
+      font-size: 16px;
+      color: var(--text);
+      background: var(--field);
+      border: 1px solid var(--line);
+      padding: 11px 12px;
+      outline: none;
+      border-radius: 0;
+    }
+    input[type=text]:focus, textarea:focus { border-color: var(--gold); }
+    textarea { min-height: 260px; resize: vertical; line-height: 1.5; }
+    textarea.invalid { border-color: var(--bad); }
+    .counter { text-align: right; font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chips input { position: absolute; opacity: 0; pointer-events: none; }
+    .chips label {
+      font-size: 14px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      background: var(--field);
+      cursor: pointer;
+      user-select: none;
+    }
+    .chips input:checked + label {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .chips input:focus-visible + label { outline: 1px dashed var(--gold); outline-offset: 2px; }
+    .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+    button {
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--bg);
+      background: var(--gold);
+      border: none;
+      padding: 13px 18px;
+      width: 100%;
+      cursor: pointer;
+      letter-spacing: 0.6px;
+    }
+    button.ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+      margin-top: 10px;
+    }
+    button:disabled { opacity: 0.55; cursor: default; }
+    .error { color: var(--bad); font-size: 14px; margin: 10px 0 0; }
+    .ok { color: var(--good); font-size: 17px; }
+    .hidden { display: none; }
+    footer {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    footer a { color: var(--gold); }
+  </style>
+</head>
+<body>
+<main>
+  <div class="panel">
+    <h1>Grand Front · предложения и пожелания</h1>
+
+    <form id="form" novalidate>
+      <div class="field">
+        <label class="title">Категория</label>
+        <div class="chips" id="cats"></div>
+      </div>
+
+      <p class="note">
+        Я буду просматривать все предложения регулярно и постепенно внедрять
+        реалистичные из них в обновлениях. Имя автора идеи, которую я возьму
+        в работу, будет указано в титрах игры, в отдельном разделе.
+        Пожалуйста, укажите имя, которым хотите подписаться в титрах.
+      </p>
+
+      <div class="field">
+        <label class="title" for="name">Имя для титров</label>
+        <input type="text" id="name" maxlength="80" autocomplete="nickname">
+      </div>
+
+      <p class="note">
+        Пожалуйста, пишите предложения максимально подробно, в идеале —
+        с примерами. Чем подробнее предложение, тем больше шансов, что оно
+        появится в игре. Можно прикладывать любые ссылки и примеры из других
+        игр. Ниже есть поле для ника в соцсетях — пожалуйста, заполните его:
+        если у меня возникнут вопросы, я напишу вам туда.
+      </p>
+
+      <div class="field">
+        <label class="title" for="text">Предложение <span class="req">*</span></label>
+        <textarea id="text" maxlength="5000"
+          placeholder="Что вы предлагаете, зачем это нужно и как это могло бы выглядеть"></textarea>
+        <div class="counter"><span id="count">0</span> / 5000</div>
+      </div>
+
+      <div class="field">
+        <label class="title" for="contact">Ник в соцсетях или другой контакт</label>
+        <input type="text" id="contact" maxlength="200"
+          placeholder="Например: @nickname в Telegram">
+      </div>
+
+      <div class="hp" aria-hidden="true">
+        <input type="text" id="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <button type="submit" id="send">Отправить</button>
+      <p class="error hidden" id="err"></p>
+    </form>
+
+    <section id="done" class="hidden">
+      <p class="ok">Спасибо! Предложение отправлено.</p>
+      <p class="muted">Я читаю все предложения. Если появятся вопросы — напишу по указанному контакту.</p>
+      <button class="ghost" id="again">Отправить ещё одно</button>
+    </section>
+  </div>
+
+  <footer>
+    Новости и обсуждение —
+    <a href="https://t.me/grandfront">Telegram-канал Grand Front</a>.
+  </footer>
+</main>
+
+<script>
+(function () {
+  var URL = 'https://ouaulukabwhopgccnxuw.supabase.co/rest/v1/suggestions';
+  var KEY = 'sb_publishable__lgEzQVWzGhaE55Hvvb53w_6rVmwzkn';
+  var MIN_LEN = 10;
+
+  var CATEGORIES = [
+    'Без категории',
+    'Интерфейс',
+    'Миссии',
+    'Механики',
+    'Новые режимы',
+    'Баланс и сложность',
+    'Поведение ИИ',
+    'Историческая точность',
+    'Графика и карта',
+    'Звук и музыка',
+    'Тексты и перевод',
+    'Исправление багов и недоработок'
+  ];
+
+  var cats = document.getElementById('cats');
+  CATEGORIES.forEach(function (c, i) {
+    var id = 'cat' + i;
+    var input = document.createElement('input');
+    input.type = 'radio'; input.name = 'cat'; input.id = id; input.value = c;
+    if (i === 0) input.checked = true;
+    var label = document.createElement('label');
+    label.htmlFor = id; label.textContent = c;
+    cats.appendChild(input); cats.appendChild(label);
+  });
+
+  var form = document.getElementById('form');
+  var text = document.getElementById('text');
+  var count = document.getElementById('count');
+  var err = document.getElementById('err');
+  var send = document.getElementById('send');
+
+  text.addEventListener('input', function () {
+    count.textContent = text.value.length;
+    if (text.value.trim().length >= MIN_LEN) text.classList.remove('invalid');
+  });
+
+  function showError(msg) {
+    err.textContent = msg;
+    err.classList.remove('hidden');
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    err.classList.add('hidden');
+
+    var body = text.value.trim();
+    if (body.length < MIN_LEN) {
+      text.classList.add('invalid');
+      text.focus();
+      showError(body.length === 0
+        ? 'Напишите, пожалуйста, само предложение.'
+        : 'Слишком коротко — опишите предложение подробнее.');
+      return;
+    }
+
+    // Поле-ловушка для ботов: человек его не видит.
+    if (document.getElementById('website').value) {
+      form.classList.add('hidden');
+      document.getElementById('done').classList.remove('hidden');
+      return;
+    }
+
+    var cat = form.querySelector('input[name=cat]:checked');
+    var payload = {
+      category: cat && cat.value !== 'Без категории' ? cat.value : null,
+      author_name: document.getElementById('name').value.trim() || null,
+      contact: document.getElementById('contact').value.trim() || null,
+      text: body
+    };
+
+    send.disabled = true;
+    send.textContent = 'Отправляем…';
+
+    fetch(URL, {
+      method: 'POST',
+      headers: {
+        'apikey': KEY,
+        'Authorization': 'Bearer ' + KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      form.reset();
+      document.getElementById('cat0').checked = true;
+      count.textContent = '0';
+      form.classList.add('hidden');
+      document.getElementById('done').classList.remove('hidden');
+      window.scrollTo(0, 0);
+    }).catch(function () {
+      showError('Не удалось отправить. Проверьте интернет и попробуйте ещё раз — текст сохранён в форме.');
+    }).then(function () {
+      send.disabled = false;
+      send.textContent = 'Отправить';
+    });
+  });
+
+  document.getElementById('again').addEventListener('click', function () {
+    document.getElementById('done').classList.add('hidden');
+    form.classList.remove('hidden');
+  });
+})();
+</script>
+</body>
+</html>
