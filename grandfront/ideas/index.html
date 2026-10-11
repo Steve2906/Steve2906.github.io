@@ -111,6 +111,13 @@
     .error { color: var(--bad); font-size: 14px; margin: 10px 0 0; }
     .ok { color: var(--good); font-size: 17px; }
     .hidden { display: none; }
+    .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .lang { display: flex; gap: 4px; flex: none; }
+    .lang button {
+      width: auto; padding: 4px 8px; font-size: 12px; letter-spacing: 1px;
+      background: transparent; color: var(--muted); border: 1px solid var(--line);
+    }
+    .lang button.on { color: var(--gold); border-color: var(--gold); }
     footer {
       margin-top: 16px;
       text-align: center;
@@ -123,15 +130,21 @@
 <body>
 <main>
   <div class="panel">
-    <h1>Grand Front · предложения и пожелания</h1>
+    <div class="top">
+      <h1 data-t="h1">Grand Front · предложения и пожелания</h1>
+      <div class="lang">
+        <button type="button" data-lang="ru">RU</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+    </div>
 
     <form id="form" novalidate>
       <div class="field">
-        <label class="title">Категория</label>
+        <label class="title" data-t="cat">Категория</label>
         <div class="chips" id="cats"></div>
       </div>
 
-      <p class="note">
+      <p class="note" data-t="note1">
         Я буду просматривать все предложения регулярно и постепенно внедрять
         реалистичные из них в обновлениях. Имя автора идеи, которую я возьму
         в работу, будет указано в титрах игры, в отдельном разделе.
@@ -139,11 +152,11 @@
       </p>
 
       <div class="field">
-        <label class="title" for="name">Имя для титров</label>
+        <label class="title" for="name" data-t="name">Имя для титров</label>
         <input type="text" id="name" maxlength="80" autocomplete="nickname">
       </div>
 
-      <p class="note">
+      <p class="note" data-t="note2">
         Пожалуйста, пишите предложения максимально подробно, в идеале —
         с примерами. Чем подробнее предложение, тем больше шансов, что оно
         появится в игре. Можно прикладывать любые ссылки и примеры из других
@@ -152,15 +165,15 @@
       </p>
 
       <div class="field">
-        <label class="title" for="text">Предложение <span class="req">*</span></label>
-        <textarea id="text" maxlength="5000"
+        <label class="title" for="text"><span data-t="text">Предложение</span> <span class="req">*</span></label>
+        <textarea id="text" maxlength="5000" data-ph="textPh"
           placeholder="Что вы предлагаете, зачем это нужно и как это могло бы выглядеть"></textarea>
         <div class="counter"><span id="count">0</span> / 5000</div>
       </div>
 
       <div class="field">
-        <label class="title" for="contact">Ник в соцсетях или другой контакт</label>
-        <input type="text" id="contact" maxlength="200"
+        <label class="title" for="contact" data-t="contact">Ник в соцсетях или другой контакт</label>
+        <input type="text" id="contact" maxlength="200" data-ph="contactPh"
           placeholder="Например: @nickname в Telegram">
       </div>
 
@@ -168,20 +181,20 @@
         <input type="text" id="website" tabindex="-1" autocomplete="off">
       </div>
 
-      <button type="submit" id="send">Отправить</button>
+      <button type="submit" id="send" data-t="send">Отправить</button>
       <p class="error hidden" id="err"></p>
     </form>
 
     <section id="done" class="hidden">
-      <p class="ok">Спасибо! Предложение отправлено.</p>
-      <p class="muted">Я читаю все предложения. Если появятся вопросы — напишу по указанному контакту.</p>
-      <button class="ghost" id="again">Отправить ещё одно</button>
+      <p class="ok" data-t="ok">Спасибо! Предложение отправлено.</p>
+      <p class="muted" data-t="okNote">Я читаю все предложения. Если появятся вопросы — напишу по указанному контакту.</p>
+      <button class="ghost" id="again" data-t="again">Отправить ещё одно</button>
     </section>
   </div>
 
   <footer>
-    Новости и обсуждение —
-    <a href="https://t.me/grandfront">Telegram-канал Grand Front</a>.
+    <span data-t="footer">Новости и обсуждение —</span>
+    <a href="https://t.me/grandfront" data-t="footerLink">Telegram-канал Grand Front</a>.
   </footer>
 </main>
 
@@ -191,31 +204,103 @@
   var KEY = 'sb_publishable__lgEzQVWzGhaE55Hvvb53w_6rVmwzkn';
   var MIN_LEN = 10;
 
+  // [в базу (всегда по-русски), подпись на английской версии]
   var CATEGORIES = [
-    'Без категории',
-    'Интерфейс',
-    'Миссии',
-    'Механики',
-    'Новые режимы',
-    'Баланс и сложность',
-    'Поведение ИИ',
-    'Историческая точность',
-    'Графика и карта',
-    'Звук и музыка',
-    'Тексты и перевод',
-    'Исправление багов и недоработок'
+    ['Без категории', 'No category'],
+    ['Интерфейс', 'Interface'],
+    ['Миссии', 'Missions'],
+    ['Механики', 'Mechanics'],
+    ['Новые режимы', 'New modes'],
+    ['Баланс и сложность', 'Balance and difficulty'],
+    ['Поведение ИИ', 'AI behaviour'],
+    ['Историческая точность', 'Historical accuracy'],
+    ['Графика и карта', 'Graphics and map'],
+    ['Звук и музыка', 'Sound and music'],
+    ['Тексты и перевод', 'Texts and translation'],
+    ['Исправление багов и недоработок', 'Bugs and rough edges']
   ];
+
+  var T = {
+    en: {
+      title: 'Grand Front — suggestions and wishes',
+      h1: 'Grand Front · suggestions and wishes',
+      cat: 'Category',
+      note1: 'I review every suggestion regularly and gradually bring the realistic ones into the game in updates. The author of every idea I take on will be named in the in-game credits, in a separate section. Please enter the name you would like to appear in the credits.',
+      name: 'Name for the credits',
+      note2: 'Please describe your suggestion in as much detail as possible, ideally with examples. The more detailed it is, the better its chances of making it into the game. Feel free to add any links and examples from other games. Below there is a field for your social media nickname — please fill it in: if I have questions, I will message you there.',
+      text: 'Suggestion',
+      textPh: 'What you suggest, why it is needed and how it could look',
+      contact: 'Social media nickname or other contact',
+      contactPh: 'For example: @nickname on Telegram',
+      send: 'Send',
+      sending: 'Sending…',
+      ok: 'Thank you! Your suggestion has been sent.',
+      okNote: 'I read every suggestion. If I have questions, I will contact you.',
+      again: 'Send another one',
+      footer: 'News and discussion —',
+      footerLink: 'Grand Front Telegram channel',
+      errEmpty: 'Please write the suggestion itself.',
+      errShort: 'Too short — please describe your suggestion in more detail.',
+      errSend: 'Could not send. Check your connection and try again — your text is still in the form.'
+    },
+    ru: {
+      sending: 'Отправляем…',
+      errEmpty: 'Напишите, пожалуйста, само предложение.',
+      errShort: 'Слишком коротко — опишите предложение подробнее.',
+      errSend: 'Не удалось отправить. Проверьте интернет и попробуйте ещё раз — текст сохранён в форме.'
+    }
+  };
+  // Русские тексты берём из разметки, чтобы не дублировать.
+  T.ru.title = document.title;
+  document.querySelectorAll('[data-t]').forEach(function (el) {
+    T.ru[el.getAttribute('data-t')] = el.textContent.trim().replace(/\s+/g, ' ');
+  });
+  document.querySelectorAll('[data-ph]').forEach(function (el) {
+    T.ru[el.getAttribute('data-ph')] = el.getAttribute('placeholder');
+  });
+
+  var lang = 'ru';
+  function t(k) { return T[lang][k]; }
 
   var cats = document.getElementById('cats');
   CATEGORIES.forEach(function (c, i) {
     var id = 'cat' + i;
     var input = document.createElement('input');
-    input.type = 'radio'; input.name = 'cat'; input.id = id; input.value = c;
+    input.type = 'radio'; input.name = 'cat'; input.id = id; input.value = c[0];
     if (i === 0) input.checked = true;
     var label = document.createElement('label');
-    label.htmlFor = id; label.textContent = c;
+    label.htmlFor = id; label.textContent = c[0];
     cats.appendChild(input); cats.appendChild(label);
   });
+
+  function setLang(l) {
+    lang = l;
+    document.documentElement.lang = l;
+    document.title = t('title');
+    document.querySelectorAll('[data-t]').forEach(function (el) {
+      el.textContent = t(el.getAttribute('data-t'));
+    });
+    document.querySelectorAll('[data-ph]').forEach(function (el) {
+      el.setAttribute('placeholder', t(el.getAttribute('data-ph')));
+    });
+    CATEGORIES.forEach(function (c, i) {
+      document.querySelector('label[for=cat' + i + ']').textContent = l === 'en' ? c[1] : c[0];
+    });
+    document.querySelectorAll('.lang button').forEach(function (b) {
+      b.classList.toggle('on', b.getAttribute('data-lang') === l);
+    });
+    try { localStorage.setItem('gf_ideas_lang', l); } catch (e) {}
+  }
+  document.querySelectorAll('.lang button').forEach(function (b) {
+    b.addEventListener('click', function () { setLang(b.getAttribute('data-lang')); });
+  });
+
+  // ?lang=en в ссылке → выбор на этом устройстве → язык браузера.
+  var saved = null;
+  try { saved = localStorage.getItem('gf_ideas_lang'); } catch (e) {}
+  var q = (location.search.match(/[?&]lang=(ru|en)/) || [])[1];
+  var ruLike = /^(ru|uk|be|kk|uz|ky|tg|hy|az)/.test((navigator.language || '').toLowerCase());
+  setLang(q || saved || (ruLike ? 'ru' : 'en'));
 
   var form = document.getElementById('form');
   var text = document.getElementById('text');
@@ -241,9 +326,7 @@
     if (body.length < MIN_LEN) {
       text.classList.add('invalid');
       text.focus();
-      showError(body.length === 0
-        ? 'Напишите, пожалуйста, само предложение.'
-        : 'Слишком коротко — опишите предложение подробнее.');
+      showError(t(body.length === 0 ? 'errEmpty' : 'errShort'));
       return;
     }
 
@@ -263,7 +346,7 @@
     };
 
     send.disabled = true;
-    send.textContent = 'Отправляем…';
+    send.textContent = t('sending');
 
     fetch(URL, {
       method: 'POST',
@@ -283,10 +366,10 @@
       document.getElementById('done').classList.remove('hidden');
       window.scrollTo(0, 0);
     }).catch(function () {
-      showError('Не удалось отправить. Проверьте интернет и попробуйте ещё раз — текст сохранён в форме.');
+      showError(t('errSend'));
     }).then(function () {
       send.disabled = false;
-      send.textContent = 'Отправить';
+      send.textContent = t('send');
     });
   });
 
