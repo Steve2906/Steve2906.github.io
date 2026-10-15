@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Политика конфиденциальности — Grand Front</title>
-  <meta name="description" content="Политика конфиденциальности мобильной игры Grand Front">
+  <meta name="description" content="Политика конфиденциальности мобильной игры Grand Front · Grand Front mobile game privacy policy">
   <style>
     :root {
       color-scheme: dark;
@@ -77,6 +77,28 @@
       margin-bottom: 1rem;
     }
 
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .lang { display: flex; gap: 4px; flex: none; margin-top: 0.4rem; }
+
+    .lang button {
+      padding: 4px 9px;
+      font: 12px/1.2 Georgia, serif;
+      letter-spacing: 1px;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .lang button.on { color: var(--accent); border-color: var(--accent); }
+
     footer {
       margin-top: 2.5rem;
       padding-top: 1rem;
@@ -88,11 +110,15 @@
 </head>
 <body>
   <main>
+    <div class="doc" lang="ru" data-doc="ru">
     <header>
-      <h1>Политика конфиденциальности</h1>
+      <div class="top">
+        <h1>Политика конфиденциальности</h1>
+        <div class="lang"></div>
+      </div>
       <p class="meta">Приложение: <strong>Grand Front</strong><br>
       Дата вступления в силу: 18 августа 2026 г.<br>
-      Последнее обновление: 9 октября 2026 г.</p>
+      Последнее обновление: 15 октября 2026 г.</p>
     </header>
 
     <section>
@@ -151,7 +177,7 @@
           успешная оплата, а также неудачная попытка ввести код (сам код, сумма
           и платёжные данные в статистику не попадают);</li>
         <li>версия Приложения, платформа (Android / iOS), магазин, из которого
-          установлено Приложение (Google Play, RuStore, Huawei AppGallery), язык
+          установлено Приложение (Google Play, App Store, RuStore, Huawei AppGallery), язык
           интерфейса и регион из настроек устройства;</li>
         <li>страна, определённая по IP-адресу при получении данных (сам IP-адрес
           не сохраняется).</li>
@@ -180,7 +206,19 @@
         напоминания — название незавершённой операции и день, на котором вы
         остановились. Уведомления не проходят через сервер и не отправляются
         третьим лицам. Отключить их можно в настройках игры (пункт
-        «Напоминания») или в настройках уведомлений Android.
+        «Напоминания») или в настройках уведомлений Android / iOS.
+      </p>
+
+      <h3>Покупки</h3>
+      <p>
+        Платные дополнения покупаются через Google Play, App Store или ЮMoney.
+        Оплату проводит магазин или платёжный сервис; данные карты и аккаунта
+        Приложению и разработчику не передаются. Чтобы выдать купленное
+        дополнение, Приложение отправляет на сервер разработчика подтверждение
+        покупки от магазина (номер транзакции или токен покупки, товар) вместе
+        со случайным идентификатором установки. Сервер проверяет покупку у
+        Google или Apple и хранит запись о ней для учёта продаж и разбора
+        обращений.
       </p>
 
       <h3>Отчёты о сбоях</h3>
@@ -271,6 +309,240 @@
     <footer>
       <p>© 2026 Grand Front. Все права защищены.</p>
     </footer>
+    </div>
+
+    <div class="doc" lang="en" data-doc="en" hidden>
+    <header>
+      <div class="top">
+        <h1>Privacy Policy</h1>
+        <div class="lang"></div>
+      </div>
+      <p class="meta">App: <strong>Grand Front</strong><br>
+      Effective date: 18 August 2026<br>
+      Last updated: 15 October 2026</p>
+    </header>
+
+    <section>
+      <p>
+        This privacy policy describes how data is handled when you use the
+        <strong>Grand Front</strong> mobile app (the “App”). The developer aims to
+        collect as little information as possible and does not share users’ data
+        with third parties for marketing or advertising purposes.
+      </p>
+    </section>
+
+    <section>
+      <h2>1. What data is processed</h2>
+      <p>
+        The App <strong>does not require registration</strong> and does not ask for
+        your name, email address, phone number or any other personal identifier.
+      </p>
+      <p>Only game and technical data is stored locally on the device:</p>
+      <ul>
+        <li>campaign progress and completed missions;</li>
+        <li>the autosave of an unfinished battle;</li>
+        <li>awards and medals earned;</li>
+        <li>interface settings (map layers, fog of war, battle effects);</li>
+        <li>sound, music, vibration and reminder settings;</li>
+        <li>flags for the completed tutorial and tips already shown;</li>
+        <li>the faction chosen for the menu theme.</li>
+      </ul>
+      <p>
+        This data is kept on the device using the operating system’s standard local
+        storage (SharedPreferences / UserDefaults) and is used only to run the game.
+      </p>
+    </section>
+
+    <section>
+      <h2>2. Data sent to servers</h2>
+      <p>
+        To improve the game, the App sends <strong>anonymous usage statistics</strong>
+        to the developer’s server:
+      </p>
+      <ul>
+        <li>App launches and the length of a play session;</li>
+        <li>starting, resuming and finishing a mission, the turn number, the result
+          (victory, defeat, return to menu) and the difficulty chosen;</li>
+        <li>first steps in the game: whether the intro video was watched or skipped,
+          opening the main menu and a mission briefing, the first unit selected,
+          the first move and the first attack;</li>
+        <li>the answer to the reminders offer, the choice in the system
+          notification permission dialog, and opening the game from a reminder;</li>
+        <li>taps on “Copy link” and “Open Telegram” on the screen for getting a DLC
+          for free;</li>
+        <li>opening the additional content (DLC) screen, going to the Telegram
+          channel, and activating a DLC with a code;</li>
+        <li>the DLC purchase flow: tapping “Buy”, cancelling, an error or a
+          successful payment, and a failed attempt to enter a code (the code itself,
+          the amount and payment details are not included);</li>
+        <li>the App version, platform (Android / iOS), the store the App was
+          installed from (Google Play, App Store, RuStore, Huawei AppGallery), the
+          interface language and the region from the device settings;</li>
+        <li>the country determined from the IP address when the data is received
+          (the IP address itself is not stored).</li>
+      </ul>
+      <p>
+        The statistics are linked only to a random identifier the App creates on
+        first use. It is not linked to your identity, any account, the advertising
+        identifier or the device’s serial numbers. The same identifier is sent when a
+        DLC code is activated, to check the activation limit.
+      </p>
+      <p>
+        The data is stored in the developer’s database on the Supabase platform and
+        is used only to understand how the App is played. It is not sold, not shared
+        with advertising networks and not used for advertising.
+      </p>
+      <p>
+        The App does not use advertising SDKs or third-party analytics services.
+      </p>
+
+      <h3>Reminders</h3>
+      <p>
+        If you agree to reminders, the App itself, on the device, schedules no more
+        than three notifications in total: on the 3rd, 7th and 14th day after the
+        first launch, if you did not play the day before. A reminder names the
+        unfinished operation and the day you stopped at. Notifications do not go
+        through a server and are not sent to third parties. You can turn them off
+        in the game settings (“Reminders”) or in the Android / iOS notification
+        settings.
+      </p>
+
+      <h3>Purchases</h3>
+      <p>
+        Paid expansions are bought through Google Play, the App Store or YooMoney.
+        Payment is handled by the store or the payment service; card and account
+        details are never passed to the App or the developer. To unlock a purchased
+        expansion, the App sends the store’s purchase confirmation (the transaction
+        number or purchase token and the product) to the developer’s server together
+        with the random install identifier. The server checks the purchase with
+        Google or Apple and keeps a record of it for sales accounting and support
+        requests.
+      </p>
+
+      <h3>Crash reports</h3>
+      <p>
+        If the App crashes or an error occurs in it, a crash report is sent to
+        <strong>Firebase Crashlytics</strong> (Google). The report contains a
+        technical description of the error (stack trace), the device model and
+        manufacturer, the operating system and App versions, free memory, screen
+        orientation, the interface language and the game context: which mission was
+        open, the turn number and the difficulty.
+      </p>
+      <p>
+        Reports are linked to an installation identifier created by Firebase and do
+        not contain a name, contact details, the advertising identifier or game
+        progress. They are used only to find and fix errors and are kept by Google
+        for up to 90 days. Processing is governed by the
+        <a href="https://firebase.google.com/support/privacy" rel="noopener noreferrer">Firebase privacy terms</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>3. Internet access</h2>
+      <p>
+        Internet access may be used to open external links when you choose to — for
+        example, the project’s official Telegram channel:
+        <a href="https://t.me/grandfront" rel="noopener noreferrer">t.me/grandfront</a>.
+      </p>
+      <p>
+        Following such links is governed by the privacy policy of the service
+        concerned (Telegram and others).
+      </p>
+    </section>
+
+    <section>
+      <h2>4. Children</h2>
+      <p>
+        The App is not designed to collect personal data from children. Since no
+        registration or personal details are required, the developer receives no
+        information that could identify a child.
+      </p>
+    </section>
+
+    <section>
+      <h2>5. Data retention and deletion</h2>
+      <p>
+        All local data stays on your device until you delete it yourself (by
+        resetting progress in the game, where available) or uninstall the App. When
+        the App is uninstalled, the operating system normally deletes its local
+        data.
+      </p>
+      <p>
+        Anonymous statistics are kept on the server no longer than needed for
+        analysis and cannot be used to tell whom they belong to.
+      </p>
+    </section>
+
+    <section>
+      <h2>6. Security</h2>
+      <p>
+        The developer takes reasonable measures to protect locally stored data, but
+        no method of storage on a mobile device can guarantee absolute security.
+        Statistics are sent over a secure connection (HTTPS); they cannot be read
+        back from the App.
+      </p>
+    </section>
+
+    <section>
+      <h2>7. Changes to this policy</h2>
+      <p>
+        This policy may be updated when the App’s features or app store
+        requirements change. The current version is always available at
+        <a href="https://steve2906.github.io/grandfront/privacy.html?lang=en">steve2906.github.io/grandfront/privacy.html</a>.
+        The date of the last update is shown at the top of this document.
+      </p>
+    </section>
+
+    <section>
+      <h2>8. Contact</h2>
+      <p>
+        For questions about privacy and data processing, you can contact the
+        developer on Telegram:
+        <a href="https://t.me/grandfront" rel="noopener noreferrer">t.me/grandfront</a>.
+      </p>
+    </section>
+
+    <footer>
+      <p>© 2026 Grand Front. All rights reserved.</p>
+    </footer>
+    </div>
   </main>
+
+  <script>
+    // RU / EN: ?lang=en in the link → the choice on this device → browser
+    // language. Without JavaScript the Russian text stays.
+    (function () {
+      var titles = {
+        ru: 'Политика конфиденциальности — Grand Front',
+        en: 'Privacy Policy — Grand Front'
+      };
+      function setLang(l) {
+        document.documentElement.lang = l;
+        document.title = titles[l];
+        document.querySelectorAll('[data-doc]').forEach(function (d) {
+          d.hidden = d.getAttribute('data-doc') !== l;
+        });
+        document.querySelectorAll('.lang button').forEach(function (b) {
+          b.classList.toggle('on', b.getAttribute('data-lang') === l);
+        });
+        try { localStorage.setItem('gf_privacy_lang', l); } catch (e) {}
+      }
+      document.querySelectorAll('.lang').forEach(function (box) {
+        ['ru', 'en'].forEach(function (l) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.setAttribute('data-lang', l);
+          b.textContent = l.toUpperCase();
+          b.addEventListener('click', function () { setLang(l); });
+          box.appendChild(b);
+        });
+      });
+      var saved = null;
+      try { saved = localStorage.getItem('gf_privacy_lang'); } catch (e) {}
+      var q = (location.search.match(/[?&]lang=(ru|en)/) || [])[1];
+      var ruLike = /^(ru|uk|be|kk|uz|ky|tg|hy|az)/.test((navigator.language || '').toLowerCase());
+      setLang(q || saved || (ruLike ? 'ru' : 'en'));
+    })();
+  </script>
 </body>
 </html>
